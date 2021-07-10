@@ -8,11 +8,9 @@
 
 -name： 按名称搜索
 
-             ```
-             find  /  -name "for*.sh"
-             find  /  -name ?1
-             find /run -type 's'
-             ```
+    find  /  -name "for*.sh"
+    find  /  -name ?1
+    find /run -type 's'
 
 -type: 按类型搜索
 
