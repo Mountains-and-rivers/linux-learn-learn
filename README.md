@@ -541,44 +541,52 @@ sed -r -n '/north/p' datafile
 删除命令：d
 
 ```
-sed -r '3d' datafile
-sed -r '3{d;}' datafile
+sed -r '3d' datafile #删除第三行
+sed -r '3{d;}' datafile  #删除第三行 同时进行其他操作 例如：sed -r '3{h;d}' datafile
 sed -r '3{d}' datafile
-sed -r '3,$d' datafile
-sed -r '$d' datafile
-sed -r '/north/d' datafile
-sed -r '/sout/d' datafile
+sed -r '3,$d' datafile #删除3到最后一行
+sed -r '$d' datafile #删除最后一行
+sed -r '/north/d' datafile #删除满足正则的行
+sed -r '/sout/d' datafile  #删除满足正则的行
 
 替换命令：s
-sed -r 's/west/north/g' datafile
-sed -r 's/^west/north/' datafile
-sed -r 's/[0-9][0-9]$/&.5/' datafile //&代表在查找串中匹配到的内容
+sed -r 's/west/north/g' datafile #全局替换west为north
+sed -r 's/^west/north/' datafile #查找以west开始的替换为north
+sed -r 's/[0-9][0-9]$/&.5/' datafile #&代表在查找串中匹配到的内容
+   解释：vim datafile 将 3~5行的前面添加#
+       ：3,5s/\(.*\)/#\1/ #比较复杂
+       ：3,5s/.*/#&/ #比较简单 ,*匹配整行，&是前面.*匹配到的内容
+       : ,5s/^/#/ #比较简单 把开始字符串换成#
+       ：%s/root/#YANG/g  #3~5行后面加 YANG
+   使用sed:
+      ：sed -r '3,5s/(.*)/#\1/' passwd #这里不用加# -r 表示扩展正则
+      ：sed -r 's/(.)(.)(.*)/\1YYY\2\3' passwd # 把每行分成3端(.)(.)(.*) 第一个字母 第二个字母 和剩下的所有
+      ：sed -r 's/(.*)(.)/\1YYY\2/' passwd #每行的最后欧一个字母前加 YYY
 sed -r 's/Hemenway/Jones/g' datafile
-sed -r 's/(Mar)got/\1ianne/g' datafile
-sed -r 's#3#88#g' datafile
+sed -r 's/(Mar)got/\1ianne/g' datafile # \1 表示保留Mar，然后把got换成ianne
+sed -r 's#3#88#g' datafile #可以表示斜线
 ```
 
 读文件命令：r
 
 ```
- sed -r '/Suan/r /etc/newfile' datafile
-sed -r '2r /etc/hosts' a.txt
-sed -r '/2/r /etc/hosts' a.txt
+ sed -r '/Suan/r /etc/newfile' datafile #读到Suan的时候把 /etc/newfile插入Suan行下面
+sed -r '2r /etc/hosts' a.txt #读到第二行的时候把 /etc/newfile插入Suan行下面
+sed -r '/2/r /etc/hosts' a.txt #读到带有2的行的时候把 /etc/newfile插入Suan行下面
 ```
 
 写文件命令：w
 
 ```
-sed -r '/north/w newfile' datafile
-sed -r '3,$w /new1.txt' datafile
+sed -r '/north/w newfile' datafile #把带有north的行写入newfile中
+sed -r '3,$w /new1.txt' datafile #将第三行到最后一行写入到new1.txt中
 ```
 
 追加命令：a
 
 ```
-# sed -r '2a\1111111111111' /etc/hosts
-
-# sed -r '2a\1111111111111\
+sed -r '2a\1111111111111' /etc/hosts #第2行后面追加1111111111111 \可以不加
+sed -r '2a\1111111111111\ #追加多行，交互式，脚本中不用写 >
 >222222222222\
 333333333333' /etc/hosts
 
@@ -606,53 +614,65 @@ sed -r '2c\111111111111\
 获取下一行命令：n
 
 ```
-sed -r '/eastern/{ n; d }' datafile
-sed -r '/eastern/{ n; s/AM/Archile/ }' datafile
+sed -r '/eastern/{ n; d }' datafile #删除第n行的下一行，n可以用多次，表示是下下行
+sed -r '/eastern/{ n; d }' datafile #删除第n行的下下行，n可以用多次，表示是下下行
+sed -r '/eastern/{ n; s/AM/Archile/ }' datafile #查到第n行的下一个行把AM替换为Archile
 ```
 
 暂存和取用命令：h H g G
 
+小写表示覆盖，大写表示追加
+
+h，H 模式空间向暂存空间写入   g，G从暂存空间读取到模式空间
+
+sed -r 'g' file 打印回车，因为暂存空间默认有个换行符（空行），覆盖了模式空间
+
+sed -r 'G;G' passwd #输出每一行下面有2个换行，G追加换行
+
+sed -r 'g;g' passwd #输出一堆换行。处理每一行都是换行
+
 ```
-sed -r '1h;$G' /etc/hosts
-sed -r '1{h;d};$G' /etc/hosts
-sed -r '1h; 2,$g' /etc/hosts
-sed -r '1h; 2,3H; $G' /etc/hosts
+sed -r '1h;$G' /etc/hosts #把第一行以覆盖的形式方在暂存空间，处理最后一行追加，相当于把第一行复制到最后一行
+sed -r '1{h;d};$G' /etc/hosts #先把第一行覆盖到暂存空间，然后删除，再取出追加到最后一行
+sed -r '1h; 2,$g' /etc/hosts #把第一行放在暂存空间，第二行到最后一行都覆盖为第一行的内容
+sed -r '1h; 2,3H; $G' /etc/hosts #第一行放在暂存空间覆盖空行，2 3不覆盖写到暂存空间，再取出追加到秒，末尾
 ```
 
 暂存空间和模式空间互换命令：x
 
 ```
-sed -r '4h; 5x; 6G' /etc/hosts
+sed -r '4h; 5x; 6G' /etc/hosts #第4行覆盖到暂存空间，模式空间处理到第5行的时候和暂存空间互换，处理到第6行取出
 ```
 
 反向选择: !
 
 ```
-sed -r '3d' /etc/hosts
-sed -r '3!d' /etc/hosts
+sed -r '3d' /etc/hosts #删除第3行
+sed -r '3!d' /etc/hosts #除了第3行都删除
 ```
 
 多重编辑选项：e
 
 ```
-sed -r -e '1,3d' -e 's/Hemenway/Jones/' datafile
+sed -r -e '1,3d' -e 's/Hemenway/Jones/' datafile #先删除第1~3行 再做替换操作
 sed -r '1,3d; s/Hemenway/Jones/' datafile
-sed -r '2s/WE/UPLOOKING/g; 2s/Gray/YYY/g' datafile
-sed -r '2{s/WE/UPLOOKING/g; s/Gray/YYY/g}' datafile
+sed -r '2s/WE/UPLOOKING/g; 2s/Gray/YYY/g' datafile 
+sed -r '2{s/WE/UPLOOKING/g; s/Gray/YYY/g}' datafile #第2行做2个操作
 ```
 
 七、sed 常见操作
 删除配置文件中#号注释行
 
 ```
-sed -ri '/^#/d' file.conf
-sed -ri '/^[ \t]*#/d' file.conf
+sed -ri '/^#/d' file.conf #删除#开始的行
+sed -ri '/^[ \t]*#/d' file.conf #如果#不是挨着最边，删除前面的tab 或空格键
 ```
 
 删除配置文件中//号注释行
 
 ```
-sed -ri '\Y^[ \t]*//Yd' file.conf
+sed -r '/^$/d' passwd #删除空行，每行都没有内容
+sed -ri '\#^[ \t]*//#d' file.conf #删除空行，包含0到多个空格或tab键的
 ```
 
 删除无内容空行
@@ -672,8 +692,8 @@ sed -ri '/^[ \t]*($|#)/d' /etc/vsftpd/vsftpd.conf
 修改文件：
 
 ```
-sed -ri '$a\chroot_local_user=YES' /etc/vsftpd/vsftpd.conf
-sed -ri '/^SELINUX=/cSELINUX=disabled' /etc/selinux/config
+sed -ri '$a\chroot_local_user=YES' /etc/vsftpd/vsftpd.conf #最后一行追加
+sed -ri '/^SELINUX=/cSELINUX=disabled' /etc/selinux/config #找到SELINUX=开始的行替换
 sed -ri '/UseDNS/cUseDNS no' /etc/ssh/sshd_config
 sed -ri '/GSSAPIAuthentication/cGSSAPIAuthentication no' /etc/ssh/sshd_config
 ```
@@ -685,7 +705,7 @@ sed -r '2,6s/^/#/' a.txt
 sed -r '2,6s/(.*)/#\1/' a.txt
 sed -r '2,6s/.*/#&/' a.txt &匹配前面查找的内容
 sed -r '3,$ s/^#*/#/' a.txt 将行首零个或多个#换成一个#
-sed -r '30,50s/^[ \t]*#*/#/' /etc/nginx.conf
+sed -r '30,50s/^[ \t]*#*/#/' /etc/nginx.conf 将行首带空格或tab键的零个或多个#换成一个#
 sed -r '2,8s/^[ \t#]*/#/' /etc/nginx.conf
 ```
 
@@ -716,4 +736,121 @@ sed -ri "\$a$var1" /etc/hosts
 3
 2
 1
+[root@tianyun ~]#tac 12345.txt
+5
+4
+3
+2
+1
 ```
+
+### 正则表达式RE
+
+重要的文本处理工具：vim sed awk grep
+
+一、什么是正则表达式？
+正则表达式（regular expression, RE）是一种字符模式，用于在查找过程中匹配指定的字符。
+在大多数程序里，正则表达式都被置于两个正斜杠之间；例如/l[oO]ve/就是由正斜杠界定的
+正则表达式，
+它将匹配被查找的行中任何位置出现的相同模式。在正则表达式中，元字符是最重要的概念。
+匹配数字: ^[0-9]+$ 123 456 5y7
+匹配 Mail： [a-z0-9_]+@[a-z0-9]+\.[a-z]+ yangsheng131420@126.com
+匹配 IP： [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}
+或
+[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}
+[root@tianyun  scripts]#  egrep  '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' /etc/sysconfig/network-scripts/ifcfg-eth0
+IPADDR=172.16.100.1
+NETMASK=255.255.255.0
+GATEWAY=172.16.100.254
+[root@tianyun  scripts]#  egrep  '[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}'
+/etc/sysconfig/network-scripts/ifcfg-eth0
+IPADDR=172.16.100.1
+NETMASK=255.255.255.0
+GATEWAY=172.16.100.254
+
+二、元字符
+
+```
+定义：元字符是这样一类字符，它们表达的是不同于字面本身的含义
+shell 元字符(也称为通配符) 由 shell 来解析，如 rm -rf *.pdf，元字符* Shell 将其解析为任意
+多个字符
+正则表达式元字符 由各种执行模式匹配操作的程序来解析，比如 vi、grep、sed、awk、python
+[root@tianyun ~]# rm -rf *.pdf
+[root@tianyun ~]# grep 'abc*' /etc/passwd
+abrt:x:173:173::/etc/abrt:/sbin/nologin
+vim 示例：
+:1,$ s/tom/David/g //如 tom、anatomy、tomatoes 及 tomorrow 中的“tom”被替换了，而 Tom
+确没被替换
+:1,$ s/\<[Tt]om\>/David/g
+1. 正则表达式元字符：
+===基本正则表达式元字符
+元字符 功能 示例
+========================================================
+^ 行首定位符 ^love
+$ 行尾定位符 love$
+. 匹配单个字符 l..e
+* 匹配前导符 0 到多次 ab*love
+.* 任意多个字符
+[] 匹配指定范围内的一个字符 [lL]ove
+[ - ] 匹配指定范围内的一个字符 [a-z0-9]ove
+[^] 匹配不在指定组内的字符 [^a-z0-9]ove
+\ 用来转义元字符 love\.
+\< 词首定位符 \<love
+\> 词尾定位符 love\>
+\(..\) 匹配稍后使用的字符的标签 :% s/172.16.130.1/172.16.130.5/
+:% s/\(172.16.130.\)1/\15/
+:% s/\(172.\)\(16.\)\(130.\)1/\1\2\35/
+:3,9 s/\(.*\)/#\1/
+x\{m\} 字符 x 重复出现 m 次 o\{5\}
+x\{m,\} 字符 x 重复出现 m 次以上 o\{5,\}
+x\{m,n\} 字符 x 重复出现 m 到 n 次 o\{5,10\}
+===扩展正则表达式元字符
++ 匹配一个或多个前导字符 [a-z]+ove
+? 匹配零个或一个前导字符 lo?ve
+a|b 匹配 a 或 b love|hate
+() 组字符 loveable|rs love(able|rs) ov+ (ov)+
+(..)(..)\1\2 标签匹配字符 (love)able\1er
+x{m} 字符 x 重复 m 次 o{5}
+x{m,} 字符 x 重复至少 m 次 o{5,}
+x{m,n} 字符 x 重复 m 到 n 次 o{5,10}
+2. POSIX 字符类：
+表达式 功能 示例
+[:alnum:] 字母与数字字符 [[:alnum:]]+
+[:alpha:] 字母字符(包括大小写字母) [[:alpha:]]{4}
+[:blank:] 空格与制表符 [[:blank:]]*
+[:digit:] 数字字母 [[:digit:]]?
+[:lower:] 小写字母 [[:lower:]]{5,}
+[:upper:] 大写字母 [[:upper:]]+
+[:punct:] 标点符号 [[:punct:]]
+[:space:] 包括换行符，回车等在内的所有空白[[:space:]]+
+三、正则匹配示例：vim
+/love/
+/^love/
+/love$/
+/l.ve/
+/lo*ve/
+/[Ll]ove/
+/love[a-z]/
+/love[^a-zA-Z0-9]/
+/.*/
+/^$/
+/^[A-Z]..$/
+/^[A-Z][a-z ]*3[0-5]/
+/[a-z]*\./
+/^ *[A-Z][a-z][a-z]$/
+/^[A-Za-z]*[^,][A-Za-z]*$/
+/\<fourth\>/
+/\<f.*th\>/
+/5{2}2{3}\./
+空行
+/^$/
+/^[ \t]*$/
+注释行
+/^#/
+/^[ \t]*#/
+:1,$ s/\([Oo]ccur\)ence/\1rence/
+:1,$ s/\(square\) and \(fair\)/\2 and \1/
+```
+
+
+
