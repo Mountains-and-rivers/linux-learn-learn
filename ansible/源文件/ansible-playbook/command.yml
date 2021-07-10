@@ -1,0 +1,9 @@
+- hosts: webserver
+  remote_user: root
+  tasks:
+  - name: cmd
+    command: ls
+
+
+
+

@@ -1,0 +1,40 @@
+第9课 正则表达式(二)
+
+1、	显示/proc/meminfo文件中以大小s开头的行；(要求：使用两种方式)
+grep -i "^s" /proc/meminfo 
+grep "^[Ss]" /proc/meminfo 
+grep -E "^(s|S)" /proc/meminfo
+
+2、	显示/etc/passwd文件中不以/bin/bash结尾的行
+[root@node1 ~]# grep '/bin/bash$' /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+zhang:x:1001:1001::/home/zhang:/bin/bash
+[root@node1 ~]# grep -v '/bin/bash$' /etc/passwd
+
+3.查找包含root字符的行
+[root@node1 ~]# grep "root" /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+operator:x:11:0:operator:/root:/sbin/nologin
+
+4.查找包含数字的行
+[root@node1 ~]# grep "[0-9]" /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+
+5. 源文件url.txt内容如下：
+www.baidu.com
+http://www.baidu.com
+https://www.baidu.com
+http://wwwbaiducom
+baidu.com
+baidu
+1.url匹配
+匹配以http或者https开头，次数0-1次. 并且其后为：并且含有.的串
+[root@node1 ~]# grep "^https\{0,1\}.*\..*" urls 
+http://www.baidu.com
+https://www.baidu.com
+
+[root@node1 ~]# grep -E '^https?.*\..*' urls
+http://www.baidu.com
+https://www.baidu.com

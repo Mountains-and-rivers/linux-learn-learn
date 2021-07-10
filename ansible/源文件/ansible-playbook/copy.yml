@@ -1,0 +1,11 @@
+- hosts: webserver
+  remote_user: root
+  tasks:
+  - name: copy file
+    copy:
+      src: /etc/hosts
+      dest: /opt/hosts
+      owner: tomcat
+      group: tomcat
+      mode: 0777
+      backup: yes

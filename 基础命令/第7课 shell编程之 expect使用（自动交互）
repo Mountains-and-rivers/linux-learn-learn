@@ -1,0 +1,64 @@
+第7课 shell编程之 expect使用（自动交互）
+
+实现自动交互，而无需人工干预。
+
+文件都以.exp为后缀
+执行使用expect file.exp
+
+1.安装Tcl编程工具
+官网首页：http://www.tcl.tk/software/tcltk/downloadnow84.tml
+
+[root@node1 ~]# tar zxf tcl8.4.20-src.tar.gz -C /usr/src/
+[root@node1 ~]# cd /usr/src/tcl8.4.20/unix/
+[root@node1 unix]# ./configure --prefix=/usr/local/tcl --enable-shared
+[root@node1 unix]# make -j 4 && make install
+[root@node1 unix]# cp tclUnixPort.h ../generic/
+
+2、安装except
+
+
+下载链接：wget https://sourceforge.net/projects/expect/files/latest/download/expect5.45.tar.gz
+
+tar zxf expect5.45.tar.gz -C /usr/src/
+cd /usr/src/expect5.45/
+./configure --prefix=/usr/local/expect --with-tcl=/usr/local/tcl/lib --with-tclinclude=/usr/src/tcl8.4.20/generic/
+make -j 4
+make install
+
+[root@node1 ~]# ln -s /usr/local/tcl/bin/expect /usr/local/expect/bin/expect
+[root@node1 ~]# ln -s /usr/local/expect/bin/expect /usr/bin/
+
+
+2.工作原理
+
+
+#!/usr/bin/expect  
+#使用/usr/bin/expect执行
+set timeout 30
+#设置程序超时时间
+spawn ssh root@192.168.1.64
+#传递指令
+expect {
+"yes/no" { send "yes\r" ;exp_continue}
+"password:" { send "123456\r"}
+
+#判断返回值是否具有关键字吗，yes/no;有，返回发送字符串yes；
+#继续判断是否具有password字段，有发送密码；
+}
+interact
+#保持链接
+
+
+#格式
+[root@node1 ~]# cat a.exp 
+#!/usr/bin/expect
+set timeout 30
+spawn ssh zhang@127.0.0.1 
+expect {
+"(yes/no)" { send "yes\r" ;exp_continue}
+"password:" { send "123456\r"}
+}
+interact
+
+
+

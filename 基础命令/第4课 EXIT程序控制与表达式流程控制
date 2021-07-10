@@ -1,0 +1,39 @@
+第4课 EXIT程序控制与表达式流程控制
+
+[root@node1 ~]# ls a.txt
+ls: cannot access a.txt: No such file or directory
+[root@node1 ~]# echo $?
+2
+[root@node1 ~]# ls /root/
+anaconda-ks.cfg  break2.sh  break.sh  cont1.sh  continue.sh  nginx-1.6.0.tar.gz
+[root@node1 ~]# echo $?
+0
+
+
+exit status
+退出状态代码：
+0 命令成功完成
+1通常的未知错误
+2误用shell命令
+126命令无法执行
+127没有找到命令
+128无效的退出参数
+128+x使用Linux信号x的致命错误。
+130使用Ctrl-C终止的命令
+255规范外的退出状态
+
+
+status 用0-255之间的数字表示,返回状态值的同时伴随着脚本的退出(其实就是退出).
+就是$? 的值 可以使用echo  进行查询
+
+
+状态码   错误信息
+222			空字符
+211			
+
+
+
+status 用0-255之间的数字表示,返回状态值的同时伴随着脚本的退出(其实就是退出).
+就是$? 的值 可以使用echo  进行查询
+
+

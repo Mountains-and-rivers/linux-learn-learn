@@ -1,0 +1,11 @@
+- hosts: webserver
+  remote_user: root
+  tasks:
+  - name: install httpd
+    yum: pkg=httpd state=latest
+
+- hosts: webserver
+  remote_user: root
+  tasks:
+  - name: start httpd
+    service: name=httpd state=started

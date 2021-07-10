@@ -1,0 +1,13 @@
+- hosts: webserver
+  remote_user: root
+  tasks:
+  - name: crate directory
+    file:
+      path: /opt/devops
+      state: directory
+      mode: 0755
+  - name: cteate sss 
+    file:
+      path: /opt/devops/httpd.conf
+      state: touch
+      mode: "u=rw,g=r,o=r"

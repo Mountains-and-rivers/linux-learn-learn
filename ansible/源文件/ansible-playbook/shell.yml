@@ -1,0 +1,11 @@
+- hosts: webserver
+  remote_user: root
+  tasks:
+  - name: cmd
+    shell: echo "test" >/opt/test.txt
+  - name: startservice
+    shell: service httpd start && chkconfig httpd on
+
+
+
+

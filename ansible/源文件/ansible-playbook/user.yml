@@ -1,0 +1,16 @@
+- hosts: webserver
+  remote_user: root
+  tasks:
+  - name: create user
+    user:
+      name: tomcat
+      uid: 5000
+      group: ftp
+      shell: /bin/bash
+      groups: root
+      append: yes
+  - name: delete user
+    user:
+      name: tomcat
+      state: absent
+      remove: yes

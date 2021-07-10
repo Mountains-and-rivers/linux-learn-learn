@@ -1,0 +1,138 @@
+第11课 sed 流编辑器
+
+sed 流编辑器  stream editor  文本编辑器 操作文本,按行进行.逐行处理  并不直接处理文本文件,而是将编辑的行,读取到内存 (内存空间 称为模式空间) 在内存中编辑 输入到屏幕上.
+
+文本处理过程
+
+把行 读取到内存-->模式匹配--> 使用sed命令编辑 --> 输出
+
+sed根据匹配的模式条件处理文本
+sed默认不对源文件做任何处理,只对模式空间的数据做处理.处理结束 将模式空间的内容输出到屏幕;
+sed简单的文本编辑语言
+
+
+sed语法格式
+sed [选项]AddressCommand 修饰符 file1… file2 ..
+
+参数解释
+选项:
+-n:不显示模式空间的内容,只显示符合条件的行.
+-i:直接修改源文件(小心)
+-e:多个操作同时进行  
+
+
+Address:  地址范围
+
+1. LineNumber       #特定的行    ($:最后一行)
+2. Start,End          # 起始行,结束行 (1,100)
+3. /^root/           #正则表达式   (找出以root开头的行)
+4. mode1,mode2    #第一次被模式1匹配的行开始,到第一次被模式2匹配的行结束.
+5. StartLine, +n      #从现在的行到往后n行  5,+2
+
+
+Command: 执行的命令
+
+d: #删除符合条件的行;
+p:输出 打印符合条件的行;
+a \内容:在指定的行后面追加新的内容;
+i \内容:在指定的行前面追加新的内容;
+r  file : 将指定的文件的内容添加到符合条件的行
+w file : 将指定的文件的内容另存为符合条件的行处
+s /模式/字符/ :查找并替换   s###  s@@@
+
+修饰符
+
+ g :替换所有
+ i: 忽略字符的大小写
+
+
+
+d: #删除符合条件的行;
+		#sed ‘1,2d’  /etc/passwd    删除/etc/passwd 前两行. 
+		#sed ‘1d’   /etc/passwd     只删除第一行.
+		#sed ‘3,$d’  /etc/passwd    删除/etc/passwd 3-最后一行
+		# sed ‘/root/d’ /etc/passwd    使用模式 删除符合root的行.
+		#sed ‘1,+3d’/etc/passwd     删除4行 第一到第四行.
+
+
+p:输出 打印符合条件的行;
+		sed ‘/^root/p’ /etc/passd  #显示以root开头的行,会显示所有内容;
+		sed -n  '/^root/p' /etc/passwd    #只显示符合条件的行;
+
+a \内容:在指定的行后面追加新的内容;
+		[root@node1 ~]# sed '/^root/a \#There are system users' passwd
+		root:x:0:0:root:/root:/bin/bash
+		#There are system users
+
+i \内容:在指定的行前面追加新的内容;
+		[root@node1 ~]# sed '/^root/i \#There are system users' passwd
+		#There are system users
+		root:x:0:0:root:/root:/bin/bash
+
+r  file : 将指定的文件的内容添加到符合条件的行处
+[root@node1 ~]# sed '2r /etc/fstab' passwd 
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+/dev/vda1            /                    ext3       noatime,acl,user_xattr 1 1
+proc                 /proc                proc       defaults              0 0
+sysfs                /sys                 sysfs      noauto                0 0
+debugfs              /sys/kernel/debug    debugfs    noauto                0 0
+devpts               /dev/pts             devpts     mode=0620,gid=5       0 0
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+
+w file : 将指定的文件的内容另存为符合条件的行处
+
+[root@node1 ~]# sed '/^root/w /home/root.txt' passwd 
+[root@node1 ~]# cat /home/root.txt 
+root:x:0:0:root:/root:/bin/bash
+
+s /模式/字符/查找并替换
+[root@node1 ~]# sed 's/root/zeyang/g' passwd 
+zeyang:x:0:0:zeyang:/zeyang:/bin/bash
+[root@node1 ~]# sed 's#zeyang#root#g' passwd 
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+
+
+实验一,将selinux的配置文件enforcing 更改成disable
+#######
+[root@node1 ~]# sed -i 's/SELINUX=disabled/SELINUX=enforcing/' /etc/sysconfig/selinux 
+[root@node1 ~]# cat /etc/sysconfig/selinux 
+
+# This file controls the state of SELinux on the system.
+# SELINUX= can take one of these three values:
+#     enforcing - SELinux security policy is enforced.
+#     permissive - SELinux prints warnings instead of enforcing.
+#     disabled - No SELinux policy is loaded.
+SELINUX=enforcing
+# SELINUXTYPE= can take one of three two values:
+#     targeted - Targeted processes are protected,
+#     minimum - Modification of targeted policy. Only selected processes are protected. 
+#     mls - Multi Level Security protection.
+SELINUXTYPE=targeted
+
+#########
+[root@node1 ~]# sed -i '7 c SELINUX=disabled' /etc/sysconfig/selinux 
+[root@node1 ~]# cat /etc/sysconfig/selinux 
+
+# This file controls the state of SELinux on the system.
+# SELINUX= can take one of these three values:
+#     enforcing - SELinux security policy is enforced.
+#     permissive - SELinux prints warnings instead of enforcing.
+#     disabled - No SELinux policy is loaded.
+SELINUX=disabled
+# SELINUXTYPE= can take one of three two values:
+#     targeted - Targeted processes are protected,
+#     minimum - Modification of targeted policy. Only selected processes are protected. 
+#     mls - Multi Level Security protection.
+SELINUXTYPE=targeted
+
+实验二 更改IP地址
+[root@node1 ~]# cat /etc/sysconfig/network-scripts/ifcfg-eth0 
+DEVICE='eth0'
+NM_CONTROLLED='yes'
+ONBOOT='yes'
+IPADDR='10.141.113.216'
+NETMASK='255.255.192.0'
+GATEWAY='10.141.64.1'
+[root@node1 ~]# sed -i '4 c IPADDR='10.141.113.216'' /etc/sysconfig/network-scripts/ifcfg-eth0 

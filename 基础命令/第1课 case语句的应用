@@ -1,0 +1,95 @@
+shell高级教程-第1课 case语句的应用
+
+1、case语句简介
+	例如启动httpd服务
+		start
+		stop
+		reload
+		restart
+
+	acl访问控制 匹配即停止。
+
+	case语句主要适用于,某个变量存在多种取值，需要对其中的每一种取值分别执行不同的命令序列。
+	case语句匹配一个值与一个模式，如果匹配成功则执行所匹配的命令序列。
+
+2、case语句的结构
+
+	case $i in
+		mode1)
+			commands1
+			;;
+		mode2)
+			commands2
+			;;
+		*)
+			default commands
+			;;
+	esac
+
+注意事项：{
+	1.取值后面必须为关键字in；
+	2.每个模式必须以右括号“)”结束；
+	3.取值可以为特定的值也可是变量；
+	4.esac关键字非常重要，代表case语句的结束；
+	5.关于双分号，代表命令序列的技术；
+	}
+
+3、case语句执行流程{
+	模式匹配:
+	匹配发现取值符合某一模式后，其间所有命令开始执行直至 ;;。
+	取值将检测匹配的每一个模式。一旦模式匹配，则执行完匹配模式相应命令后不再继续其他模式。
+	如果无一匹配模式，使用星号 * 捕获该值，再执行后面的命令。
+	}
+
+4、小实例
+	脚本名称：untar.sh
+	作用：批量解压文件
+	脚本实现思路：{
+		1、文件是压缩包（tar.gz，tar.bz2）
+		2、解压文件的命令（tar.gz(tar zxf file ) ,tar.bz2(tar jxf file)
+		3、制作测试环境中文件
+			{
+			tar zcf /home/passwd.tar.gz /etc/passwd
+			tar zcf /home/passwd.tar.bz2 /etc/passwd
+			}
+	}
+	脚本内容{
+	#!/bin/bash
+
+	FILE=/home/
+
+	case $1 in 
+		*.tar.gz)
+			tar zxf $FILE$1
+			if [ $? -eq 0 ]
+				then
+					echo "$1 success!"
+				else
+					echo "$1 false!"
+			fi
+		;;
+		*.tar.bz2)
+			tar jxf $FILE$1
+			if [ $? -eq 0 ]
+				then
+					echo "$1 success!"
+				else
+					echo "$1 false!"
+			fi
+		;;
+		*)
+			echo "Please Use {tar.gz|tar.bz2} format file !"
+		;;
+	esac
+	}
+
+	执行结果
+[root@centos home]# ls
+passwd.tar.bz2  passwd.tar.gz  untar.sh
+[root@centos home]# sh untar.sh passwd.tar.gz 
+passwd.tar.gz success!
+[root@centos home]# ls
+etc  passwd.tar.bz2  passwd.tar.gz  untar.sh
+[root@centos home]# ls etc/
+passwd
+
