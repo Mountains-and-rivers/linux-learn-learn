@@ -898,5 +898,16 @@ lo(ve){2} #ve出现 n=2次
 :1,$ s/\(square\) and \(fair\)/\2 and \1/ #字符串换位置
 ```
 
+![image](https://github.com/Mountains-and-rivers/linux-learn-learn/blob/main/images/2.png)
 
+![image](https://github.com/Mountains-and-rivers/linux-learn-learn/blob/main/images/1.png)
 
+![image](https://github.com/Mountains-and-rivers/linux-learn-learn/blob/main/images/3.png)
+
+![image](https://github.com/Mountains-and-rivers/linux-learn-learn/blob/main/images/4.png)
+
+![image](https://github.com/Mountains-and-rivers/linux-learn-learn/blob/main/images/5.png)
+
+![image](https://github.com/Mountains-and-rivers/linux-learn-learn/blob/main/images/6.png)
+
+![image](https://github.com/Mountains-and-rivers/linux-learn-learn/blob/main/images/7.png)
