@@ -47,7 +47,7 @@ find ./ -maxdepth 1 -type 'f' | xargs ls -l #同上
 find ./ -maxdepth 1 -type 'f' -print0 | xargs -0 ls -l
 
 和 exec的区别： exec 可以搜索到文件 adb\ axy
-而xargs 需要携程 -print0 | xargs -0的形式
+而xargs 需要写成 -print0 | xargs -0的形式
 ```
 
 ### grep命令
