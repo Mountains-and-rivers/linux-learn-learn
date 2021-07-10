@@ -703,6 +703,7 @@ sed -ri "\$a$var1" /etc/hosts
 ```
 
 练习：
+``` 
 [root@tianyun ~]# vim 12345.txt
 1
 2
@@ -715,3 +716,4 @@ sed -ri "\$a$var1" /etc/hosts
 3
 2
 1
+```
