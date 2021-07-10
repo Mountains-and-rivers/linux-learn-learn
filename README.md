@@ -836,40 +836,7 @@ POSIX 字符类
 | [:punct:] | 标点符号                         | [[:punct:]]     |
 | [:space:] | 包括换行符，回车等在内的所有空白 | [[:space:]]+    |
 
-正则匹配示例：vim
-
-```
-/love/
-/^love/
-/love$/
-/l.ve/
-/lo*ve/
-/[Ll]ove/
-/love[a-z]/
-/love[^a-zA-Z0-9]/
-/.*/
-/^$/
-/^[A-Z]..$/
-/^[A-Z][a-z ]*3[0-5]/
-/[a-z]*\./
-/^ *[A-Z][a-z][a-z]$/
-/^[A-Za-z]*[^,][A-Za-z]*$/
-/\<fourth\>/
-/\<f.*th\>/
-/5{2}2{3}\./
-空行
-/^$/
-/^[ \t]*$/
-注释行
-/^#/
-/^[ \t]*#/
-:1,$ s/\([Oo]ccur\)ence/\1rence/
-:1,$ s/\(square\) and \(fair\)/\2 and \1/
-```
-
-
-
-示例：
+正则匹配示例
 
 ```
 grep 'c*' passwd #表示 c出现0 次到多次
@@ -881,6 +848,54 @@ vim test.txt
 Tom、anatomy、tomatoes、tomorrow
 
 ：%s/\<[tT]om\>/TOM/g <>表示单词首位
+grep '^[^rc]oot' passwd #以不是rc开头的 []中的^表示取反，外面的表示以 xx 开头
+grep '\<root\>' passwd #包含root单词的行
+grep '^\<root\>' passwd #root开头的
+:%s/\(10.18.40.\)100/\1200/ #\1经过转义表示前面的内容
+:%s/\(10.18.40\).100/\1.200/ #\1经过转义表示前面的内容
+:%s/\(10.\)\(18.\)\(40.\)100/\1\2\3200/ #\1经过转义表示前面的内容 这里的（）只支持到9个
+:3,9 s/\(.*\)/#\1/ #3~9行前面添加# .* 匹配一整行
+:3,9 s/\(.*\)/\1YANG/ #3~9行后面添加YANG .* 匹配一整行
+grep "ro*" passwd #o出现任意次
+grep "ro\{2\}" passwd #o重复出现2次
+grep "ro\{2,\}" passwd #o重复出现2次以上
+grep "ro\+t" passwd #o重复出现1次以上
+egrep "ro+t" passwd #o重复出现1次以上
+grep "ro?t" passwd #o出现0~1次以上
+egrep 'root|alice' passwd
+love* #e出现 0~n次
+love? #e出现0~1次
+love+ #e出现1~n次
+love{2} #出现 n=2次
+lo(ve)* #ve出现 0~n次
+lo(ve)? #ve出现0~1次
+lo(ve)+ #ve出现1~n次
+lo(ve){2} #ve出现 n=2次
+
+/love/ #love
+/^love/ #love开头
+/love$/ #love结尾
+/l.ve/ # l开头任意一个字符ve
+/lo*ve/ #l和~多个o再加ve
+/[Ll]ove/ #l或L开头，加ve
+/love[a-z]/ #love加小写字母
+/love[^a-zA-Z0-9]/ #love非字母非数字
+/.*/ #整行
+/^$/ #空行
+/^[A-Z]..$/ #大写字母2个任意字符结尾
+/^[A-Z][a-z ]*3[0-5]/  以大字母任意个写字母，，0~5之前的数字
+/[a-z]*\./ #0~多个小写字母后面加个.
+/^ *[A-Z][a-z][a-z]$/ #以0~多个空格开头，大写字母 小写字母结尾
+/^[A-Za-z]*[^,][A-Za-z]*$/ #以0~多个英文字母，非, 0~多个英文字母结尾
+/\<fourth\>/ #单词fourth
+/\<f.*th\>/
+/5{2}2{3}\./ #5出现2次 2出现3次,点
+/^$/ 空行
+/^[ \t]*$/ 
+/^#/ #以#开始的行
+/^[ \t]*#/ #先0~多个空格或tab 再跟#
+:1,$ s/\([Oo]ccur\)ence/\1rence/
+:1,$ s/\(square\) and \(fair\)/\2 and \1/ #字符串换位置
 ```
 
 
