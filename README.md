@@ -26,6 +26,44 @@ find ./ -type 'f'
 find / -size 1000 #默认单位是512b
 find / -size +1M -size -5M #M必须大写
 find / -size +1k -size -5k #k必须大写
+
+find 按文件修改时间查找文件
+
+----(+n)---------|------------(n)--------------|---------(-n)----
+   (n+1)*24H前   |    (n+1)*24H ~ n*24H之间  |  n*24H以内
+
+-ctime -n    查找距现在 n*24H 内修改过的文件
+-ctime n    查找距现在 n*24H 前, (n+1)*24H 内修改过的文件
+-ctime +n    查找距现在 (n+1)*24H 前修改过的文件
+
+[a|c|m]min    [最后访问|最后状态修改|最后内容修改]min 
+[a|c|m]time    [最后访问|最后状态修改|最后内容修改]time
+
+linux 文件的几种时间 (以 find 为例):
+atime 最后一次访问时间, 如 ls, more 等, 但 chmod, chown, ls, stat 等不会修改些时间, 使用 ls -utl 可以按此时间顺序查看;
+ctime 最后一次状态修改时间, 如 chmod, chown 等状态时间改变但修改时间不会改变, 使用 stat file 可以查看;
+mtime 最后一次内容修改时间, 如 vi 保存后等, 修改时间发生改变的话, atime 和 ctime 也相应跟着发生改变.
+
+注意: linux 里是不会记录文件的创建时间的, 除非这个文件自创建以来没有发生改变, 那么它的创建时间就是它的最后一次修改时间.
+#ls -lt    ./  按修改时间顺序查看
+#ls -lut ./ 按访问时间顺序查看
+(如果想反序查看的话需要加一个选项 -r)
+ 
+ 
+以上出自 “ShawOnline” 博客，请务必保留此出处http://shawonline.blog.51cto.com/304978/199674
+
+ 
+
+[acm]time  计量单位是天，即24H
+
+[acm]min    计量单位是分钟
+
+find ./ -mtime 0  #查找一天内修改的文件
+
+find ./ -mtime -2 #查找2天内修改的文件，多了一个减号
+
+find ./ -mmin  -10  #查找距离现在10分钟内修改的文件
+
 ```
 
 -maxdepth：指定搜索层级深入度。放置于其他参数之前
@@ -111,6 +149,17 @@ BEGIN 通常定义一些变量，在行处理之前。
 例如：
 awk 'BEGIN{FS=":"} {print $1,$2} END{print "----------"}' /etc/passwd # FS 定义字段分隔符
  awk 'BEGIN{FS=":";OFS="----"} {print $1,$2}' /etc/passwd
+ 
+ 统计分析中经常用的awk命令，其中用的最多的还是切分
+
+
+cat  test | awk -F',' '{print $1,$2} 能够很好的将记录按照需要切分开，
+
+
+但是如何获取最后一列呢？
+
+
+可以使用awk -F',' '{print $NF}' 来获取，mark一下
 
 ```
 
